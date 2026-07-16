@@ -58,6 +58,8 @@ td{
 
 padding:10px;
 border-bottom:1px solid #ddd;
+text-align:center;
+
 
 }
 
@@ -67,6 +69,21 @@ background:#f2f2f2;
 
 }
 
+/* Odd rows */
+tbody tr:nth-child(odd){
+    background:#ffffff;
+}
+
+/* Even rows */
+tbody tr:nth-child(even){
+    background:#f2f2f2;
+}
+
+/* Hover effect */
+tbody tr:hover{
+    background:#dbeafe;
+    transition:0.2s;
+}
 
 /* ================= Progress Loader ================= */
 
