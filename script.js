@@ -36,6 +36,17 @@ fetch(API_URL)
 
     showData(data);
 
+
+document.getElementById("totalDealer").innerHTML =
+"Total Dealers : " + dealers.length;
+
+document.getElementById("lastUpdate").innerHTML =
+"Last Updated : " + new Date().toLocaleString("en-IN");
+
+
+
+
+
     clearInterval(loading);
 
     progress = 100;
@@ -91,3 +102,25 @@ document.getElementById("search").addEventListener("keyup", function () {
     showData(result);
 
 });
+
+
+
+setInterval(() => {
+
+    fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+
+        dealers = data;
+
+        showData(data);
+
+        document.getElementById("totalDealer").innerHTML =
+        "Total Dealers : " + dealers.length;
+
+        document.getElementById("lastUpdate").innerHTML =
+        "Last Updated : " + new Date().toLocaleString("en-IN");
+
+    });
+
+}, 30000);
