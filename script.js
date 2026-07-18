@@ -1,16 +1,17 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbw2wpsWD4rFUFZo-exTybDR4yK0J-V4fUZfnfCIh5iGvwf1zA4Dsa1c_478Wt23ip1T/exec";
 
 let dealers = [];
+let lastUpdate = "";
 
 const loadingBox = document.getElementById("loadingBox");
 const progressBar = document.getElementById("progressBar");
 const progressText = document.getElementById("progressText");
 const dealerTable = document.getElementById("dealerTable");
 
-// Table hide
+// Hide Table
 dealerTable.style.display = "none";
 
-// Progress Start
+// Progress Animation
 let progress = 0;
 
 const loading = setInterval(() => {
@@ -26,30 +27,25 @@ const loading = setInterval(() => {
 
 }, 30);
 
+// ================= First Load =================
 
-// Fetch Data
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
 
-    dealers = data;
+    dealers = data.dealers;
+    lastUpdate = data.lastUpdate;
 
-    showData(data);
+    showData(dealers);
 
+    document.getElementById("totalDealer").innerHTML =
+    "Total Dealers : " + dealers.length;
 
-document.getElementById("totalDealer").innerHTML =
-"Total Dealers : " + dealers.length;
-
-document.getElementById("lastUpdate").innerHTML =
-"Last Updated : " + new Date().toLocaleString("en-IN");
-
-
-
-
+    document.getElementById("lastUpdate").innerHTML =
+    "Last Updated : " + data.lastUpdate;
 
     clearInterval(loading);
 
-    progress = 100;
     progressBar.style.width = "100%";
     progressText.innerHTML = "Loading... 100%";
 
@@ -71,39 +67,40 @@ document.getElementById("lastUpdate").innerHTML =
 
 });
 
-function showData(list) {
+// ================= Show Data =================
+
+function showData(list){
 
     const body = document.getElementById("tableBody");
 
-    body.innerHTML = "";
-
-    list.forEach(item => {
-
-        body.innerHTML += `
+    body.innerHTML = list.map(item => `
         <tr>
             <td>${item.code}</td>
             <td>${item.name}</td>
         </tr>
-        `;
-
-    });
+    `).join("");
 
 }
 
-document.getElementById("search").addEventListener("keyup", function () {
+// ================= Search =================
+
+document.getElementById("search").addEventListener("input", function(){
 
     const value = this.value.toLowerCase();
 
     const result = dealers.filter(d =>
+
         d.code.toLowerCase().includes(value) ||
+
         d.name.toLowerCase().includes(value)
+
     );
 
     showData(result);
 
 });
 
-
+// ================= Background Check =================
 
 setInterval(() => {
 
@@ -111,16 +108,36 @@ setInterval(() => {
     .then(res => res.json())
     .then(data => {
 
-        dealers = data;
+        // Agar Google Sheet update nahi hui
+        if(data.lastUpdate === lastUpdate){
 
-        showData(data);
+            return;
+
+        }
+
+        // Update hua hai
+        lastUpdate = data.lastUpdate;
+
+        dealers = data.dealers;
+
+        // Agar user search nahi kar raha to full data dikhao
+        const search = document.getElementById("search").value.trim();
+
+        if(search === ""){
+
+            showData(dealers);
+
+        }
 
         document.getElementById("totalDealer").innerHTML =
         "Total Dealers : " + dealers.length;
 
         document.getElementById("lastUpdate").innerHTML =
-        "Last Updated : " + new Date().toLocaleString("en-IN");
+        "Last Updated : " + data.lastUpdate;
 
-    });
+        console.log("Dealer Data Updated");
+
+    })
+    .catch(err => console.error(err));
 
 }, 30000);
