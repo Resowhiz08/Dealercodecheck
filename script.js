@@ -69,9 +69,23 @@ fetch(API_URL)
 
 // ================= Show Data =================
 
+
 function showData(list){
 
     const body = document.getElementById("tableBody");
+
+    if(list.length === 0){
+
+        body.innerHTML = `
+        <tr>
+            <td colspan="2" style="padding:40px;font-size:18px;color:#666;">
+                ❌ No Dealer Found
+            </td>
+        </tr>
+        `;
+
+        return;
+    }
 
     body.innerHTML = list.map(item => `
         <tr>
